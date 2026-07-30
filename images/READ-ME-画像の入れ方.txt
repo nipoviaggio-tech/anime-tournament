@@ -1,0 +1,37 @@
+■ アニメ画像の入れ方
+
+このフォルダ(images)に、下記のファイル名で画像を置いてください。
+形式は .jpg（縦長 3:4 くらいが最適。例 600x800px）。
+置いた画像は自動でゲームに表示されます。無い作品はタイトル文字で表示されます。
+
+ファイル名 → 作品
+onepiece.jpg    → One Piece
+naruto.jpg      → Naruto
+aot.jpg         → 進撃の巨人 (L'Attacco dei Giganti)
+dbz.jpg         → Dragon Ball Z
+demonslayer.jpg → 鬼滅の刃 (Demon Slayer)
+jjk.jpg         → 呪術廻戦 (Jujutsu Kaisen)
+mha.jpg         → 僕のヒーローアカデミア (My Hero Academia)
+chainsawman.jpg → チェンソーマン (Chainsaw Man)
+bleach.jpg      → Bleach
+hxh.jpg         → ハンター×ハンター (Hunter x Hunter)
+jojo5.jpg       → ジョジョ 黄金の風 (JoJo Vento Aureo)
+deathnote.jpg   → Death Note
+fmab.jpg        → 鋼の錬金術師 (Fullmetal Alchemist: Brotherhood)
+tokyoghoul.jpg  → 東京喰種 (Tokyo Ghoul)
+evangelion.jpg  → エヴァンゲリオン (Neon Genesis Evangelion)
+edgerunners.jpg → Cyberpunk: Edgerunners
+opm.jpg         → ワンパンマン (One-Punch Man)
+dandadan.jpg    → ダンダダン (Dandadan)
+haikyu.jpg      → ハイキュー!! (Haikyu!!)
+bluelock.jpg    → ブルーロック (Blue Lock)
+kuroko.jpg      → 黒子のバスケ (Kuroko no Basket)
+spyfamily.jpg   → SPY×FAMILY
+ranma.jpg       → らんま1/2 (Ranma ½)
+bebop.jpg       → Cowboy Bebop
+sailormoon.jpg  → セーラームーン (Sailor Moon)
+pokemon.jpg     → Pokémon
+
+■ 遊び方（動作確認）
+index.html をダブルクリックしてブラウザで開くだけで動きます。
+（音は最初の「▶ Inizia il torneo」を押した後に鳴ります。ブラウザの仕様です）

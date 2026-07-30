@@ -1,0 +1,508 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Anime Tournament · Test della Personalità — Scopri la tua psiche profonda dal tuo anime preferito | nipo</title>
+<style>
+  :root{
+    --bg:#0b0d1a; --bg2:#141834; --accent:#E8321A; --accent2:#37e0ff; --gold:#ffd24a;
+    --text:#f4f5ff; --muted:#9aa0c8;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{
+    background:radial-gradient(1200px 800px at 50% -10%, #1c2350 0%, var(--bg) 60%);
+    color:var(--text); font-family:'Segoe UI',system-ui,Arial,sans-serif;
+    overflow-x:hidden;
+  }
+  .wrap{max-width:1000px;margin:0 auto;padding:16px;min-height:100%;display:flex;flex-direction:column}
+  header.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .logo{font-weight:900;font-size:22px;letter-spacing:1px}
+  .logo b{color:var(--accent)}
+  .muteBtn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);color:var(--text);
+    border-radius:999px;padding:8px 14px;cursor:pointer;font-size:14px}
+  .muteBtn:hover{background:rgba(255,255,255,.16)}
+
+  /* progress */
+  .progress{margin:14px 0 6px;color:var(--muted);font-size:13px;text-align:center;letter-spacing:.5px}
+  .bar{height:6px;background:rgba(255,255,255,.08);border-radius:999px;overflow:hidden;margin-bottom:8px}
+  .bar > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--gold));transition:width .4s ease}
+
+  .stage{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:18px;padding:10px 0 30px}
+  h1.title{font-size:26px;text-align:center;margin:8px 0 0;font-weight:900}
+  .sub{color:var(--muted);text-align:center;margin:0 0 6px;font-size:15px}
+
+  .vs{display:grid;grid-template-columns:1fr 64px 1fr;align-items:center;gap:10px;width:100%;max-width:820px}
+  @media(max-width:620px){ .vs{grid-template-columns:1fr 44px 1fr;gap:6px} }
+  .card{
+    position:relative;border-radius:18px;overflow:hidden;cursor:pointer;
+    background:linear-gradient(160deg,#232a55,#171b39);
+    border:2px solid rgba(255,255,255,.10);
+    aspect-ratio:3/4; transition:transform .18s ease, box-shadow .18s ease, border-color .18s;
+    will-change:transform,opacity;
+  }
+  .card:hover{transform:translateY(-6px) scale(1.02);border-color:var(--accent2);box-shadow:0 14px 40px rgba(55,224,255,.25)}
+  .card img{width:100%;height:100%;object-fit:cover;display:block}
+  .card .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;
+    padding:14px;font-weight:800;font-size:18px;line-height:1.3;
+    background:linear-gradient(160deg,#2a3266,#191d3d);color:#dfe3ff}
+  .card .cap{position:absolute;left:0;right:0;bottom:0;padding:10px 12px;
+    background:linear-gradient(0deg,rgba(0,0,0,.82),transparent);font-weight:800;font-size:16px}
+  .card .genre{position:absolute;top:10px;left:10px;font-size:11px;letter-spacing:.5px;text-transform:uppercase;
+    background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.2);padding:3px 8px;border-radius:999px;color:#cfd4ff}
+  .vsBadge{display:flex;align-items:center;justify-content:center;font-weight:900;color:var(--gold);
+    font-size:22px;text-shadow:0 0 18px rgba(255,210,74,.6)}
+
+  /* animazioni scelta */
+  .win{animation:winPulse .5s ease}
+  @keyframes winPulse{0%{transform:scale(1)}40%{transform:scale(1.08);box-shadow:0 0 60px rgba(255,210,74,.7)}100%{transform:scale(1)}}
+  .flyL{animation:flyLeft .55s cubic-bezier(.5,-.3,.7,1) forwards}
+  .flyR{animation:flyRight .55s cubic-bezier(.5,-.3,.7,1) forwards}
+  @keyframes flyRight{to{transform:translateX(140%) rotate(22deg) scale(.6);opacity:0}}
+  @keyframes flyLeft{to{transform:translateX(-140%) rotate(-22deg) scale(.6);opacity:0}}
+
+  /* schermata finale */
+  .final{width:100%;max-width:760px;text-align:center;display:none}
+  .winnerCard{margin:0 auto 14px;max-width:280px;border-radius:20px;overflow:hidden;border:3px solid var(--gold);
+    box-shadow:0 0 70px rgba(255,210,74,.5);aspect-ratio:3/4;position:relative;animation:winPulse .8s ease}
+  .winnerCard img{width:100%;height:100%;object-fit:cover}
+  .winnerCard .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:14px;font-weight:900;font-size:20px;background:linear-gradient(160deg,#2a3266,#191d3d)}
+  .crown{font-size:40px;margin-bottom:-6px}
+  .champ{font-size:24px;font-weight:900;margin:6px 0}
+  .blurb{color:#dfe3ff;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);
+    border-radius:14px;padding:14px 16px;margin:14px 0;line-height:1.6;font-size:15px;text-align:left}
+  .diag{background:linear-gradient(160deg,#26214d,#171b39);border:1px solid rgba(255,255,255,.14);
+    border-radius:16px;padding:18px;margin:14px 0;text-align:left}
+  .diag h3{margin:.1em 0 .3em;color:var(--gold);font-size:19px}
+  .diag p{margin:.3em 0;color:#e7e9ff;line-height:1.6}
+  textarea{width:100%;min-height:90px;border-radius:12px;border:1px solid rgba(255,255,255,.18);
+    background:rgba(255,255,255,.06);color:var(--text);padding:12px;font-size:15px;resize:vertical;font-family:inherit}
+  .row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:10px}
+  .btn{border:none;border-radius:999px;padding:12px 20px;font-weight:800;font-size:15px;cursor:pointer}
+  .btn.primary{background:linear-gradient(90deg,var(--accent),#ff6a4d);color:#fff}
+  .btn.ghost{background:rgba(255,255,255,.08);color:var(--text);border:1px solid rgba(255,255,255,.2)}
+  .btn:hover{filter:brightness(1.08)}
+
+  /* nipo funnel banner */
+  .nipoBanner{display:block;margin:22px auto 8px;max-width:728px;border-radius:16px;overflow:hidden;
+    text-decoration:none;border:1px solid rgba(255,255,255,.16);
+    background:linear-gradient(120deg,#112240,#1b3a6b);color:#fff}
+  .nipoBanner .inner{display:flex;align-items:center;gap:16px;padding:16px 20px}
+  .nipoBanner .big{font-size:20px;font-weight:900}
+  .nipoBanner .small{color:#cfe0ff;font-size:14px}
+  .nipoBanner .go{margin-left:auto;font-weight:900;color:var(--gold);white-space:nowrap}
+  .nipoBanner img{max-width:100%;display:block}
+
+  .start{width:100%;max-width:640px;text-align:center;display:flex;flex-direction:column;gap:14px;align-items:center}
+  .heroImg{max-width:100%;width:520px;border-radius:18px;box-shadow:0 16px 50px rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.12)}
+  .hero{font-size:34px;font-weight:900;line-height:1.15;margin:10px 0 0}
+  .hero .em{color:var(--accent)}
+  .lead{color:var(--muted);font-size:16px;line-height:1.6;margin:0}
+  footer{color:var(--muted);text-align:center;font-size:12px;padding:14px 0 24px}
+  .hidden{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="topbar">
+    <div class="logo"><b>nipo</b> · Anime Tournament</div>
+    <button class="muteBtn" id="muteBtn">🔊 Audio</button>
+  </header>
+
+  <!-- START -->
+  <section class="stage" id="startScreen">
+    <div class="start">
+      <img class="heroImg" src="images/hero.png" alt="Anime Tournament · Test della Personalità" />
+      <div class="hero">Anime Tournament ·<br><span class="em">Test della Personalità</span></div>
+      <p class="lead" style="font-weight:700;color:#cfd4ff;margin-bottom:-4px">Scopri la tua psiche profonda partendo dal tuo anime preferito</p>
+      <p class="lead">Scegli tra due titoli alla volta. A ogni scelta il tuo preferito resta e l'altro vola via.
+        Alla fine sveleremo il tuo anime numero uno... e cosa dice davvero di te (senza pietà).</p>
+      <button class="btn primary" id="startBtn">▶ Inizia il torneo</button>
+      <p class="lead" style="font-size:13px">26 titoli · circa 12 scelte · 2 minuti</p>
+    </div>
+  </section>
+
+  <!-- GAME -->
+  <section class="stage hidden" id="gameScreen">
+    <div style="width:100%;max-width:820px">
+      <div class="bar"><i id="barFill"></i></div>
+      <div class="progress" id="progressTxt">Turno 1</div>
+    </div>
+    <h1 class="title" id="roundTitle">Scegli il tuo preferito</h1>
+    <p class="sub" id="roundSub">Tocca la copertina che ami di più</p>
+    <div class="vs">
+      <div class="card" id="cardL" data-side="L">
+        <div class="genre" id="genreL"></div>
+        <div class="ph" id="phL"></div>
+        <div class="cap" id="capL"></div>
+      </div>
+      <div class="vsBadge">VS</div>
+      <div class="card" id="cardR" data-side="R">
+        <div class="genre" id="genreR"></div>
+        <div class="ph" id="phR"></div>
+        <div class="cap" id="capR"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL -->
+  <section class="stage">
+    <div class="final" id="finalScreen">
+      <div class="crown">👑</div>
+      <div class="winnerCard" id="winnerCard"></div>
+      <div class="champ" id="champName"></div>
+      <div class="blurb" id="champBlurb"></div>
+
+      <div class="diag" id="diagBox">
+        <h3 id="diagTitle"></h3>
+        <p id="diagText"></p>
+      </div>
+
+      <div style="text-align:center">
+        <div class="row">
+          <button class="btn primary" id="shareBtn">📤 Condividi la tua diagnosi anime</button>
+          <button class="btn ghost" id="againBtn">🔄 Rigioca</button>
+        </div>
+      </div>
+
+      <!-- NIPO FUNNEL BANNER -->
+      <p style="font-weight:800;margin:18px 0 8px;color:#cfd4ff">🗼 Vivi davvero il Giappone degli anime con nipo</p>
+      <a class="nipoBanner" id="nipoBanner" href="https://nipo-viaggio.it/it/citta/tokyo/anime-guide-map" target="_blank" rel="noopener">
+        <img src="images/nipo-banner.png" alt="Scopri i luoghi anime di Tokyo con nipo" />
+      </a>
+    </div>
+  </section>
+
+  <footer>Powered by <b>nipo</b> · Il Giappone autentico 🇯🇵</footer>
+</div>
+
+<script>
+/* ====================== DATI: 26 anime ======================
+   画像は images/{id}.jpg を置くと自動で表示されます（無ければタイトルのプレースホルダー）。
+   genre: shonen / dark / sports / legend （性格診断に使用）
+*/
+const ANIME = [
+  // 王道・バトル (shonen)
+  {id:"onepiece", name:"One Piece", genre:"shonen", blurb:"Un inno all'amicizia e alla libertà. La ciurma di Rufy ti ricorda che i sogni più grandi si inseguono insieme."},
+  {id:"naruto", name:"Naruto", genre:"shonen", blurb:"Dalla solitudine al riconoscimento: la storia di chi non si arrende mai, nemmeno quando tutti voltano le spalle."},
+  {id:"aot", name:"L'Attacco dei Giganti", genre:"dark", blurb:"Libertà, dolore e verità scomode. Un'epopea che ti costringe a guardare oltre il muro delle tue certezze."},
+  {id:"dbz", name:"Dragon Ball Z", genre:"shonen", blurb:"L'anime che ha insegnato a un'intera generazione il gusto di superare i propri limiti, urlando."},
+  {id:"demonslayer", name:"Demon Slayer", genre:"shonen", blurb:"Bellezza e gentilezza anche nel dolore. Tanjiro combatte i demoni senza mai perdere il cuore."},
+  {id:"jjk", name:"Jujutsu Kaisen", genre:"shonen", blurb:"Maledizioni, stile e adrenalina. Un dark-shonen moderno che non lascia respiro."},
+  {id:"mha", name:"My Hero Academia", genre:"shonen", blurb:"In un mondo di supereroi, conta ciò che scegli di diventare. Plus Ultra!"},
+  {id:"chainsawman", name:"Chainsaw Man", genre:"dark", blurb:"Grezzo, folle e umanissimo. I desideri più semplici di Denji nascondono una malinconia profonda."},
+  {id:"bleach", name:"Bleach", genre:"shonen", blurb:"Stile puro. Spade, spiriti ed eleganza: uno dei Big Three che ha segnato un'epoca."},
+  {id:"hxh", name:"Hunter x Hunter", genre:"shonen", blurb:"Strategia, regole e psicologia. Un'avventura che premia chi ama pensare oltre la forza."},
+  {id:"jojo5", name:"Le Bizzarre Avventure di JoJo: Vento Aureo", genre:"shonen", blurb:"Ambientato in Italia! Stile assurdo, pose iconiche e un sogno: cambiare la mafia dall'interno."},
+  // SF / dark
+  {id:"deathnote", name:"Death Note", genre:"dark", blurb:"Un quaderno, un dio della morte e il confine tra giustizia e ossessione. Puro brivido intellettuale."},
+  {id:"fmab", name:"Fullmetal Alchemist: Brotherhood", genre:"dark", blurb:"Il prezzo di ogni cosa. Una storia perfetta su perdita, legami e speranza."},
+  {id:"tokyoghoul", name:"Tokyo Ghoul", genre:"dark", blurb:"Cosa resta di umano quando il mondo ti rifiuta? Gotico, doloroso, indimenticabile."},
+  {id:"evangelion", name:"Neon Genesis Evangelion", genre:"dark", blurb:"Robot, angeli e la fragilità dell'animo umano. Un'opera che continua a farci domande."},
+  {id:"edgerunners", name:"Cyberpunk: Edgerunners", genre:"dark", blurb:"Neon, velocità e cuori spezzati a Night City. Bellissimo e struggente."},
+  {id:"opm", name:"One-Punch Man", genre:"shonen", blurb:"E se fossi già il più forte... e ti annoiassi? Satira geniale e battaglie spettacolari."},
+  {id:"dandadan", name:"Dandadan", genre:"dark", blurb:"Occulto, alieni e comicità sfrenata. Il fenomeno più fresco e scatenato del momento."},
+  // sports / slice / comedy
+  {id:"haikyu", name:"Haikyu!!", genre:"sports", blurb:"Il volley come non l'hai mai sentito: sudore, squadra e la gioia di volare a rete."},
+  {id:"bluelock", name:"Blue Lock", genre:"sports", blurb:"L'ego come arma. Il calcio giapponese reinventato per chi vuole essere il numero uno."},
+  {id:"kuroko", name:"Kuroko no Basket", genre:"sports", blurb:"L'ombra e la luce. Basket spettacolare e amicizie che diventano rivalità leggendarie."},
+  {id:"spyfamily", name:"Spy × Family", genre:"sports", blurb:"Una spia, un'assassina e una telepate: la famiglia più improbabile e adorabile che ci sia."},
+  {id:"ranma", name:"Ranma ½", genre:"sports", blurb:"Commedia senza tempo tra arti marziali e trasformazioni. Un classico anni '90 sempre attuale."},
+  // legend / pop
+  {id:"bebop", name:"Cowboy Bebop", genre:"legend", blurb:"Jazz, spazio e malinconia da adulti. See you space cowboy..."},
+  {id:"sailormoon", name:"Sailor Moon", genre:"legend", blurb:"Magia, amicizia e stile: un'icona che ha ispirato moda e pop culture di generazioni."},
+  {id:"pokemon", name:"Pokémon", genre:"legend", blurb:"Il linguaggio comune di milioni di persone. Un'avventura che non finisce mai."},
+  {id:"inuyasha", name:"InuYasha", genre:"legend", blurb:"Viaggi nel tempo, demoni e un amore impossibile. Un classico anni 2000 che sa ancora di merenda dopo la scuola."},
+  {id:"frieren", name:"Frieren - Oltre la fine del viaggio", genre:"dark", blurb:"E dopo la vittoria contro il Re dei Demoni? Un capolavoro delicato sul tempo, la memoria e ciò che conta davvero."},
+];
+
+const GENRE_LABEL = {shonen:"Battle", dark:"SF · Dark", sports:"Sport · Vita", legend:"Leggenda"};
+
+/* ====================== AUDIO (Web Audio, sintetizzato) ====================== */
+const Audio_ = (()=>{
+  let ctx, master, bgmGain, bgmTimer, muted=false, started=false;
+  function ensure(){
+    if(ctx) return;
+    ctx = new (window.AudioContext||window.webkitAudioContext)();
+    master = ctx.createGain(); master.gain.value = muted?0:0.9; master.connect(ctx.destination);
+    bgmGain = ctx.createGain(); bgmGain.gain.value = 0.5; bgmGain.connect(master);
+  }
+  function tone(freq,dur,type="sine",gain=0.25,when=0){
+    const t=ctx.currentTime+when;
+    const o=ctx.createOscillator(), g=ctx.createGain();
+    o.type=type; o.frequency.value=freq;
+    g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(gain,t+0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+    o.connect(g); g.connect(master); o.start(t); o.stop(t+dur+0.02);
+  }
+  function noise(dur=0.5,gain=0.4){
+    const t=ctx.currentTime;
+    const buf=ctx.createBuffer(1,ctx.sampleRate*dur,ctx.sampleRate);
+    const d=buf.getChannelData(0);
+    for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*(1-i/d.length);
+    const src=ctx.createBufferSource(); src.buffer=buf;
+    const bp=ctx.createBiquadFilter(); bp.type="highpass"; bp.frequency.value=600;
+    const g=ctx.createGain(); g.gain.value=gain;
+    src.connect(bp); bp.connect(g); g.connect(master); src.start(t);
+  }
+  // BGM: 和風 — 和太鼓＋琴（サンプル3）。日本らしい緊張感と祭りの高揚。
+  const koto=[587,0,698,0,784,0,587,0,880,0,784,698,587,0,523,0]; // 琴（和ペンタトニック）
+  let step=0;
+  function boom(t,g=0.55){ // 和太鼓
+    const o=ctx.createOscillator(), gg=ctx.createGain();
+    o.type="sine"; o.frequency.setValueAtTime(120,t); o.frequency.exponentialRampToValueAtTime(40,t+0.5);
+    gg.gain.setValueAtTime(g,t); gg.gain.exponentialRampToValueAtTime(0.0001,t+0.5);
+    o.connect(gg); gg.connect(bgmGain); o.start(t); o.stop(t+0.52);
+  }
+  function hat(t,g=0.05,dur=0.02){ // 小鼓風
+    const buf=ctx.createBuffer(1,ctx.sampleRate*dur,ctx.sampleRate);
+    const d=buf.getChannelData(0); for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
+    const s=ctx.createBufferSource(); s.buffer=buf;
+    const hp=ctx.createBiquadFilter(); hp.type="highpass"; hp.frequency.value=8000;
+    const g2=ctx.createGain(); g2.gain.value=g;
+    s.connect(hp); hp.connect(g2); g2.connect(bgmGain); s.start(t);
+  }
+  function voice(freq,t,dur,type,gain){
+    if(!freq) return;
+    const o=ctx.createOscillator(), g=ctx.createGain();
+    o.type=type; o.frequency.value=freq;
+    g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(gain,t+0.015);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+    o.connect(g); g.connect(bgmGain); o.start(t); o.stop(t+dur+0.02);
+  }
+  function startBgm(){
+    if(bgmTimer) return;
+    const stepMs=180;
+    bgmTimer=setInterval(()=>{
+      if(!ctx) return;
+      const t=ctx.currentTime;
+      const k=step%16;
+      voice(koto[k],t,0.30,"triangle",0.12);   // 琴の旋律
+      if(k%4===0) boom(t,0.55);                  // 大太鼓（強拍）
+      if(k===6||k===14) boom(t,0.35);            // 合いの手
+      if(k%2===1) hat(t,0.05,0.02);              // 小鼓
+      step++;
+    },stepMs);
+  }
+  return {
+    start(){ ensure(); if(ctx.state==="suspended") ctx.resume(); if(!started){started=true; startBgm();} },
+    select(){ ensure(); tone(660,0.12,"square",0.22); tone(990,0.12,"square",0.18,0.04); },
+    whoosh(){ ensure(); noise(0.45,0.35); tone(200,0.4,"sawtooth",0.12); },
+    fanfare(){ ensure(); const s=[523,659,784,1047]; s.forEach((f,i)=>tone(f,0.5,"square",0.25,i*0.12)); },
+    toggle(){ muted=!muted; ensure(); master.gain.value=muted?0:0.9; return muted; },
+  };
+})();
+
+/* ====================== LOGICA TORNEO ====================== */
+let pool=[], nextRound=[], current=null, roundNum=1, totalPicks=0, picksDone=0;
+const picks=[]; // storia scelte (oggetti anime scelti)
+
+function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+
+// seeding: ordina per genere così i simili si incontrano presto, poi mescola dentro il genere
+function seed(){
+  const byGenre={};
+  ANIME.forEach(a=>{(byGenre[a.genre]=byGenre[a.genre]||[]).push({...a})});
+  let arr=[];
+  ["shonen","dark","sports","legend"].forEach(g=>{ if(byGenre[g]) arr=arr.concat(shuffle(byGenre[g])); });
+  return arr;
+}
+
+function estimatePicks(n){ let c=0; while(n>1){ c+=Math.floor(n/2); n=Math.ceil(n/2);} return c; }
+
+const el=id=>document.getElementById(id);
+
+function startGame(){
+  Audio_.start();
+  pool=seed(); nextRound=[]; roundNum=1; picksDone=0; picks.length=0;
+  totalPicks=estimatePicks(pool.length);
+  el('startScreen').classList.add('hidden');
+  el('gameScreen').classList.remove('hidden');
+  el('finalScreen').style.display='none';
+  nextMatch();
+}
+
+function roundName(remaining){
+  if(remaining<=2) return "Finalissima";
+  if(remaining<=4) return "Semifinale";
+  if(remaining<=8) return "Quarti di finale";
+  if(remaining<=16) return "Ottavi";
+  return "Turno "+roundNum;
+}
+
+function nextMatch(){
+  // se nel pool resta 1 solo e nextRound vuoto -> vincitore
+  if(pool.length===1 && nextRound.length===0){ return finish(pool[0]); }
+  // se pool ha meno di 2, passa al round successivo
+  if(pool.length<2){
+    if(pool.length===1){ nextRound.push(pool[0]); } // bye
+    pool=shuffle(nextRound); nextRound=[]; roundNum++;
+    return nextMatch();
+  }
+  const a=pool.shift(), b=pool.shift();
+  current={a,b};
+  render(a,b);
+}
+
+function render(a,b){
+  const remaining=pool.length+nextRound.length+2;
+  el('roundTitle').textContent=roundName(remaining);
+  el('roundSub').textContent="Tocca la copertina che ami di più";
+  el('progressTxt').textContent=`Scelta ${picksDone+1} di ~${totalPicks}`;
+  el('barFill').style.width=Math.min(100,(picksDone/totalPicks)*100)+'%';
+  fill('L',a); fill('R',b);
+  el('cardL').className='card'; el('cardR').className='card';
+}
+
+function fill(side,a){
+  el('genre'+side).textContent=GENRE_LABEL[a.genre]||'';
+  el('cap'+side).textContent=a.name;
+  const ph=el('ph'+side);
+  ph.innerHTML='';
+  const img=new Image();
+  img.onload=()=>{ ph.innerHTML=''; ph.style.background='none'; ph.appendChild(img); };
+  img.onerror=()=>{ ph.style.background=''; ph.textContent=a.name; };
+  img.src='images/'+a.id+'.jpg';
+  ph.textContent=a.name; // fallback immediato mentre carica
+}
+
+function choose(side){
+  if(!current) return;
+  const winner = side==='L'?current.a:current.b;
+  const loserCard = side==='L'?el('cardR'):el('cardL');
+  const winCard = side==='L'?el('cardL'):el('cardR');
+  Audio_.select();
+  winCard.classList.add('win');
+  loserCard.classList.add(side==='L'?'flyR':'flyL');
+  setTimeout(()=>Audio_.whoosh(),90);
+  picks.push(winner); nextRound.push(winner); picksDone++;
+  current=null;
+  setTimeout(nextMatch,560);
+}
+
+el('cardL').addEventListener('click',()=>choose('L'));
+el('cardR').addEventListener('click',()=>choose('R'));
+
+/* ====================== FINALE + DIAGNOSI ====================== */
+// Archetipi in base al genere dominante (tono sarcastico, black humor, slang)
+const DIAG = {
+  shonen:{t:"🔥 Otaku Shōnen Cronico", d:"Diagnosi: da piccolo urlavi le mosse in cameretta e ancora oggi sei convinto che l'amicizia paghi l'affitto. Vivi di power-up e discorsoni motivazionali di 4 episodi. Nobile, energico e leggermente fuori di testa. La terapia? \"Basta crederci più forte\"."},
+  dark:{t:"🌙 Edgelord in Lista d'Attesa dal Terapeuta", d:"Diagnosi: adolescenza passata a base di crisi esistenziali e wifi instabile. Hai visto Evangelion troppo presto e da allora confondi \"profondità\" con \"trauma non elaborato\". Intelligente, cupo, insopportabile alle cene. Ti piace soffrire con stile."},
+  sports:{t:"⚡ Atleta da Divano (Categoria Peso Massimo di Snack)", d:"Diagnosi: l'unico sport che pratichi è alzare il telecomando, ma dentro sei un campione olimpico. Ami sudore, squadra e urla di incoraggiamento — purché le faccia qualcun altro sullo schermo. Solare, rumoroso, contagioso."},
+  legend:{t:"📼 Boomer degli Anime Travestito da Giovane", d:"Diagnosi: piangi sulle sigle anni '90 e giudichi in silenzio chi non ha visto Cowboy Bebop. \"Ai miei tempi gli anime erano arte\". Raffinato, nostalgico e insopportabilmente snob. In fondo hai anche ragione, ed è la parte peggiore."},
+};
+
+// Battuta personalizzata sul vincitore (una per titolo)
+const WINNER_LINE = {
+  onepiece:"E alla fine vince One Piece: 1000+ episodi, esattamente come la tua capacità di non mollare una cosa nemmeno quando dovresti. Rispetto.",
+  naruto:"Naruto campione: sei quello che 'nessuno mi capiva', e ora lo racconti a chiunque non lo abbia chiesto. Ttebayo.",
+  aot:"L'Attacco dei Giganti al top: fiducia negli esseri umani pari a zero, sopracciglia da villain in aumento. Preoccupante ma coerente.",
+  dbz:"Dragon Ball Z vincitore: urli 'KAMEHAMEHA' dentro di te ogni volta che apri un barattolo difficile. Lo sappiamo.",
+  demonslayer:"Demon Slayer sul trono: ti sei innamorato dell'animazione e hai finto fosse per la trama. Onestà zero, gusto estetico dieci.",
+  jjk:"Jujutsu Kaisen re: ami lo stile, la sofferenza e i personaggi che muoiono. Praticamente un rapporto tossico, ma animato benissimo.",
+  mha:"My Hero Academia campione: dentro di te c'è ancora un bambino che aspetta il suo superpotere. Spoiler dolce: forse è la gentilezza.",
+  chainsawman:"Chainsaw Man vince: i tuoi sogni sono semplici e leggermente disturbanti, esattamente come Denji. Pane, riposo e affetto. Same.",
+  bleach:"Bleach al top: hai scelto con lo stile più che con la testa. Bandana metaforica, posa fighissima, trama... vabbè.",
+  hxh:"Hunter x Hunter vincitore: ami le regole complicate e sentirti più intelligente degli altri. E, dettaglio, spesso lo sei davvero.",
+  jojo5:"JoJo Vento Aureo campione: ambientato in Italia, pose assurde e sopracciglia scolpite. Sei drammatico per natura e ne vai fiero.",
+  deathnote:"Death Note vince: da qualche parte hai pensato 'io il quaderno lo userei meglio'. Ed è esattamente il motivo per cui non dovresti averlo.",
+  fmab:"Fullmetal Alchemist Brotherhood al top: gusto impeccabile, cuore grande. Sei la persona che a fine serie 'aveva solo qualcosa nell'occhio'.",
+  tokyoghoul:"Tokyo Ghoul vincitore: fase gotica mai davvero superata. Playlist tristi e maschera metaforica sempre pronta. Ti dona, comunque.",
+  evangelion:"Evangelion campione: complimenti, la tua psiche è ufficialmente più complicata di un episodio finale. 'Get in the robot', e anche in terapia.",
+  edgerunners:"Cyberpunk Edgerunners vince: neon, velocità e cuore a pezzi. Ami le storie che ti distruggono in 10 episodi. Masochista raffinato.",
+  opm:"One-Punch Man al top: ironico e disilluso. Sei fortissimo ma ti annoi di tutto, incluso probabilmente questo test.",
+  dandadan:"Dandadan vincitore: caos, alieni e ormoni. La tua mente è un tab del browser con 47 schede aperte e nessun rimpianto.",
+  haikyu:"Haikyu!! campione: hai pianto per una partita di pallavolo disegnata. Cuore enorme, resistenza alle emozioni pari a zero.",
+  bluelock:"Blue Lock vince: ego alle stelle e istinto killer. Nel calcio (e nella vita) faresti a sportellate. Rispettabilmente egoista.",
+  kuroko:"Kuroko no Basket al top: ami il gioco di squadra e i bishonen sudati. Nessun giudizio, solo statistiche molto chiare.",
+  spyfamily:"Spy × Family vincitore: vuoi solo una famiglia carina e un po' di pace. Cuore morbido travestito da persona normale. Adorabile.",
+  ranma:"Ranma ½ campione: nostalgia pura e umorismo demenziale. Sei rimasto agli anni d'oro di Italia 1 e stai benissimo così.",
+  bebop:"Cowboy Bebop vince: raffinatezza da vendere e malinconia da adulti. See you space cowboy... e sì, ti senti superiore. Legittimo.",
+  sailormoon:"Sailor Moon al top: potere, stile e amicizia. Trasformazione di 3 minuti mentre il nemico aspetta educatamente. Iconico, come te.",
+  pokemon:"Pokémon vincitore: il tuo bambino interiore ha vinto su tutta la linea. 'Gotta catch 'em all', inclusi i traumi. Ma con affetto.",
+  inuyasha:"InuYasha campione: nostalgia da merende su Italia 1. Il tuo primo crush animato aveva le orecchie da cane e, ammettilo, non te ne sei mai ripreso del tutto.",
+  frieren:"Frieren al top: piangi per un'elfa che impara a piangere. Sei una persona profonda travestita da normale, e no, non hai 'qualcosa nell'occhio', stai proprio piangendo.",
+};
+
+function finish(winner){
+  el('gameScreen').classList.add('hidden');
+  const f=el('finalScreen'); f.style.display='block';
+  // winner card
+  const wc=el('winnerCard'); wc.innerHTML='';
+  const img=new Image();
+  const ph=document.createElement('div'); ph.className='ph'; ph.textContent=winner.name;
+  wc.appendChild(ph);
+  img.onload=()=>{ wc.innerHTML=''; wc.appendChild(img); };
+  img.onerror=()=>{};
+  img.src='images/'+winner.id+'.jpg';
+  el('champName').textContent='🏆 '+winner.name;
+  el('champBlurb').textContent=winner.blurb;
+
+  // diagnosi: analizza TUTTO il percorso, non solo il vincitore
+  const count={};
+  picks.forEach(p=>count[p.genre]=(count[p.genre]||0)+1);
+  let dom=winner.genre, max=-1;
+  for(const g in count){ if(count[g]>max){max=count[g];dom=g;} }
+  const d=DIAG[dom]||DIAG.shonen;
+
+  const total=picks.length || 1;
+  const ratio=max/total;
+  let journey;
+  if(ratio>=0.7) journey="Il tuo percorso è di una coerenza inquietante: hai scelto sempre lo stesso tipo di storie. Purista assoluto, zero dubbi, zero tradimenti. Quasi preoccupante.";
+  else if(ratio<=0.42) journey="Il tuo percorso è ovunque: generi sparsi a caso. O sei di mente apertissima, o non hai la più pallida idea di cosa ti piaccia. Probabilmente entrambe le cose.";
+  else journey="Il tuo percorso mostra un debole evidente per un genere, ma ogni tanto tradisci con gusto. Sai cosa ami, però ti concedi la scappatella.";
+  if(winner.genre!==dom) journey+=" E il colpo di scena finale: vince un genere diverso da quello che sceglievi di più. Un finale scritto di fretta, praticamente.";
+  journey+=` Lungo la strada hai eliminato ${picksDone} titoli senza un briciolo di rimorso. Freddezza da villain di terza stagione.`;
+
+  const full = d.d + "\n\n" + journey + "\n\n" + (WINNER_LINE[winner.id]||"");
+  el('diagTitle').textContent=d.t;
+  el('diagText').style.whiteSpace='pre-line';
+  el('diagText').textContent=full;
+
+  Audio_.fanfare();
+  window.scrollTo({top:0,behavior:'smooth'});
+  window.__winner=winner; window.__diag=d; window.__diagFull=full;
+
+  enhanceWithAI(winner); // AI診断で上書き（失敗時はルールベースのまま）
+}
+
+// AI診断（Cloudflare Function /api/diagnose を呼ぶ）。ローカルファイル等で失敗したらそのまま。
+async function enhanceWithAI(winner){
+  const titleEl=el('diagTitle');
+  titleEl.insertAdjacentHTML('afterend','<div id="aiNote" style="color:#37e0ff;font-size:12px;margin:4px 0">🤖 Sto affinando la diagnosi con l\'AI...</div>');
+  try{
+    const payload={ winner:{name:winner.name,genre:winner.genre},
+      picks:picks.map(p=>({name:p.name,genre:p.genre})), picksDone:picksDone };
+    const r=await fetch('/api/diagnose',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    if(!r.ok) throw new Error('api '+r.status);
+    const dd=await r.json();
+    if(dd && dd.text){
+      titleEl.textContent=dd.title||titleEl.textContent;
+      el('diagText').textContent=dd.text;
+      window.__diagFull=dd.text;
+    }
+  }catch(e){ /* fallback: diagnosi rule-based già mostrata */ }
+  finally{ const n=document.getElementById('aiNote'); if(n) n.remove(); }
+}
+
+el('startBtn').addEventListener('click',startGame);
+el('againBtn').addEventListener('click',()=>{ el('finalScreen').style.display='none'; startGame(); });
+
+el('muteBtn').addEventListener('click',()=>{
+  const m=Audio_.toggle();
+  el('muteBtn').textContent=m?'🔇 Muto':'🔊 Audio';
+});
+
+el('shareBtn').addEventListener('click',async ()=>{
+  const w=window.__winner, d=window.__diag;
+  const text=`🏆 Il mio anime del cuore: ${w.name}\n🧠 ${d.t}\n\n${window.__diagFull}\n\nFai anche tu il Test della Personalità Anime di nipo 👉`;
+  const url='https://nipo-viaggio.it/it/citta/tokyo/anime-guide-map';
+  try{
+    if(navigator.share){ await navigator.share({title:'Anime Tournament · Test della Personalità · nipo',text,url}); }
+    else{ await navigator.clipboard.writeText(text+'\n'+url); el('shareBtn').textContent='✅ Copiato negli appunti!'; setTimeout(()=>el('shareBtn').textContent='📤 Condividi la tua diagnosi anime',1900); }
+  }catch(e){}
+});
+</script>
+</body>
+</html>

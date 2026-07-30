@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>BGM 試聴サンプル · Anime Tournament</title>
+<style>
+  body{margin:0;background:radial-gradient(1000px 600px at 50% -10%,#1c2350,#0b0d1a 60%);
+    color:#f4f5ff;font-family:'Segoe UI',system-ui,Arial,sans-serif;min-height:100vh}
+  .wrap{max-width:720px;margin:0 auto;padding:24px 16px 60px}
+  h1{font-size:24px;margin:6px 0 2px}
+  .lead{color:#9aa0c8;margin:0 0 18px;line-height:1.6;font-size:14px}
+  .card{display:flex;align-items:center;gap:14px;background:linear-gradient(160deg,#232a55,#171b39);
+    border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:14px 16px;margin-bottom:12px}
+  .card .num{font-weight:900;font-size:22px;color:#ffd24a;width:26px;text-align:center;flex:none}
+  .card .info{flex:1}
+  .card .name{font-weight:800;font-size:17px}
+  .card .desc{color:#c2c7ee;font-size:13px;margin-top:2px;line-height:1.5}
+  .btn{flex:none;border:none;border-radius:999px;padding:11px 18px;font-weight:800;font-size:15px;cursor:pointer;
+    background:linear-gradient(90deg,#E8321A,#ff6a4d);color:#fff;min-width:96px}
+  .btn.playing{background:linear-gradient(90deg,#37e0ff,#4f7bff)}
+  .btn:hover{filter:brightness(1.08)}
+  .vol{display:flex;align-items:center;gap:10px;margin:6px 0 18px;color:#9aa0c8;font-size:13px}
+  input[type=range]{flex:1}
+  .foot{color:#9aa0c8;font-size:12px;margin-top:14px;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🎵 BGM 試聴サンプル</h1>
+  <p class="lead">各カードの「▶ 再生」を押して聴き比べてください（同時に鳴るのは1つだけ）。気に入った番号を教えてもらえれば、ゲームに組み込みます。テンポや明るさの微調整も後からできます。</p>
+  <div class="vol">🔊 音量 <input id="vol" type="range" min="0" max="100" value="70"></div>
+  <div id="list"></div>
+  <p class="foot">Anime Tournament · nipo</p>
+</div>
+
+<script>
+let ctx, master;
+function ensure(){
+  if(ctx) return;
+  ctx=new (window.AudioContext||window.webkitAudioContext)();
+  master=ctx.createGain(); master.gain.value=0.7; master.connect(ctx.destination);
+}
+document.getElementById('vol').addEventListener('input',e=>{ if(master) master.gain.value=e.target.value/100; });
+
+// ---- strumenti ----
+function v(freq,t,dur,type,gain){ if(!freq)return;
+  const o=ctx.createOscillator(),g=ctx.createGain();
+  o.type=type;o.frequency.value=freq;
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(gain,t+0.015);
+  g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+  o.connect(g);g.connect(master);o.start(t);o.stop(t+dur+0.02);
+}
+function vGlide(f1,f2,t,dur,type,gain){
+  const o=ctx.createOscillator(),g=ctx.createGain();
+  o.type=type;o.frequency.setValueAtTime(f1,t);o.frequency.exponentialRampToValueAtTime(f2,t+dur);
+  g.gain.setValueAtTime(gain,t);g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+  o.connect(g);g.connect(master);o.start(t);o.stop(t+dur+0.02);
+}
+function kick(t,g=0.55){ vGlide(160,48,t,0.16,"sine",g); }
+function boom(t,g=0.6){ vGlide(120,40,t,0.5,"sine",g); } // timpani/taiko
+function snare(t,g=0.25){
+  const buf=ctx.createBuffer(1,ctx.sampleRate*0.12,ctx.sampleRate);
+  const d=buf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*(1-i/d.length);
+  const s=ctx.createBufferSource();s.buffer=buf;
+  const bp=ctx.createBiquadFilter();bp.type="bandpass";bp.frequency.value=1800;
+  const gg=ctx.createGain();gg.gain.value=g;s.connect(bp);bp.connect(gg);gg.connect(master);s.start(t);
+}
+function hat(t,g=0.08,dur=0.03){
+  const buf=ctx.createBuffer(1,ctx.sampleRate*dur,ctx.sampleRate);
+  const d=buf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
+  const s=ctx.createBufferSource();s.buffer=buf;
+  const hp=ctx.createBiquadFilter();hp.type="highpass";hp.frequency.value=8000;
+  const gg=ctx.createGain();gg.gain.value=g;s.connect(hp);hp.connect(gg);gg.connect(master);s.start(t);
+}
+
+// ---- 6 stili (step: funzione chiamata a ogni tick) ----
+const STYLES = [
+  { name:"1. アーケード格闘ゲーム風（チップチューン）",
+    desc:"明るいスクエア波のフック＋グルーヴ。90年代アーケードの対戦格闘の雰囲気。",
+    tempo:150,
+    step(i){ const t=ctx.currentTime;
+      const lead=[659,784,880,988,880,784,659,587,523,587,659,784,988,880,784,659];
+      const bass=[131,131,165,131,175,175,131,131,98,98,131,131,165,175,196,196];
+      const k=i%16; v(lead[k],t,0.16,"square",0.10); v(lead[k]*2,t,0.10,"square",0.02);
+      v(bass[k],t,0.16,"triangle",0.16);
+      if(k%4===0)kick(t); if(k%8===4)snare(t); hat(t+0.04);
+    }},
+  { name:"2. 熱血・王道少年アニメOP風",
+    desc:"疾走感のあるサウ波メロディ＋4つ打ち。胸が熱くなる王道アニメの主題歌風。",
+    tempo:130,
+    step(i){ const t=ctx.currentTime;
+      const lead=[587,659,740,880,988,880,740,659,587,494,587,740,880,988,1109,988];
+      const bass=[147,147,147,147,165,165,165,165,110,110,110,110,196,196,196,196];
+      const k=i%16; v(lead[k],t,0.15,"sawtooth",0.09);
+      v(bass[k],t,0.14,"sawtooth",0.13);
+      if(k%4===0)kick(t,0.55); if(k%8===4)snare(t,0.28); hat(t+0.03,0.07);
+    }},
+  { name:"3. 和風・和太鼓＋琴",
+    desc:"和太鼓の力強い打ちと、琴のペンタトニック旋律。日本らしい緊張感と祭りの高揚。",
+    tempo:180,
+    step(i){ const t=ctx.currentTime;
+      const koto=[587,0,698,0,784,0,587,0,880,0,784,698,587,0,523,0]; // 和ペンタ
+      const k=i%16;
+      v(koto[k],t,0.30,"triangle",0.12);
+      if(k%4===0)boom(t,0.55);           // 大太鼓
+      if(k===6||k===14)boom(t,0.35);     // 合いの手
+      if(k%2===1)hat(t,0.05,0.02);        // 小鼓風
+    }},
+  { name:"4. シンセウェイブ（レトロ80s）",
+    desc:"ネオンの光を思わせる温かいシンセ。ノスタルジックで少し切ない、大人っぽい雰囲気。",
+    tempo:170,
+    step(i){ const t=ctx.currentTime;
+      const arp=[440,523,659,880,659,523,440,330,392,494,587,784,587,494,392,294];
+      const k=i%16;
+      // pad (chord ri-triggerato dolcemente)
+      if(k%8===0){ v(220,t,1.6,"sawtooth",0.05); v(262,t,1.6,"sawtooth",0.04); v(330,t,1.6,"sawtooth",0.04); }
+      v(arp[k],t,0.22,"square",0.06);
+      if(k%4===0)kick(t,0.45); if(k%8===4)snare(t,0.20); hat(t+0.045,0.05);
+    }},
+  { name:"5. エピック・オーケストラ（壮大バトル）",
+    desc:"低弦の刻みとブラスの一撃、ティンパニの轟き。映画のクライマックスのような壮大さ。",
+    tempo:150,
+    step(i){ const t=ctx.currentTime;
+      const ost=[98,98,98,131,98,98,98,131,87,87,87,116,98,98,131,147]; // 低弦オスティナート
+      const k=i%16;
+      v(ost[k],t,0.14,"sawtooth",0.12);
+      if(k%8===0){ v(196,t,0.5,"sawtooth",0.08); v(247,t,0.5,"sawtooth",0.07); v(294,t,0.5,"sawtooth",0.07); } // ブラス和音
+      if(k%4===0)boom(t,0.6); if(k===8)snare(t,0.2);
+    }},
+  { name:"6. ローファイ・チル（落ち着き）",
+    desc:"ゆったりした和音とやわらかいビート。診断結果画面などに合う、静かで心地よい雰囲気。",
+    tempo:300,
+    step(i){ const t=ctx.currentTime;
+      const k=i%8;
+      if(k===0){ v(220,t,1.2,"sine",0.10); v(262,t,1.2,"sine",0.08); v(330,t,1.2,"sine",0.07); } // Am
+      if(k===4){ v(196,t,1.2,"sine",0.10); v(247,t,1.2,"sine",0.08); v(294,t,1.2,"sine",0.07); } // G
+      if(k%4===0)kick(t,0.35); if(k===4)snare(t,0.12); if(k%2===1)hat(t,0.04);
+    }},
+];
+
+let timer=null, playingIdx=-1;
+function stopAll(){
+  if(timer){clearInterval(timer);timer=null;}
+  playingIdx=-1;
+  document.querySelectorAll('.btn').forEach((b,i)=>{ b.textContent='▶ 再生'; b.classList.remove('playing'); });
+}
+function play(idx){
+  ensure(); if(ctx.state==='suspended')ctx.resume();
+  if(playingIdx===idx){ stopAll(); return; }
+  stopAll();
+  playingIdx=idx;
+  const st=STYLES[idx]; let i=0;
+  st.step(i++); // primo colpo immediato
+  timer=setInterval(()=>st.step(i++), st.tempo);
+  const b=document.querySelectorAll('.btn')[idx];
+  b.textContent='⏹ 停止'; b.classList.add('playing');
+}
+
+const list=document.getElementById('list');
+STYLES.forEach((s,idx)=>{
+  const card=document.createElement('div'); card.className='card';
+  card.innerHTML=`<div class="num">${idx+1}</div>
+    <div class="info"><div class="name">${s.name.replace(/^\d+\.\s*/,'')}</div><div class="desc">${s.desc}</div></div>`;
+  const btn=document.createElement('button'); btn.className='btn'; btn.textContent='▶ 再生';
+  btn.onclick=()=>play(idx);
+  card.appendChild(btn); list.appendChild(card);
+});
+</script>
+</body>
+</html>
