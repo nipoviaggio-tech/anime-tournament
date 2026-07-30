@@ -425,6 +425,7 @@ const WINNER_LINE = {
   frieren:"Frieren al top: piangi per un'elfa che impara a piangere. Sei una persona profonda travestita da normale, e no, non hai 'qualcosa nell'occhio', stai proprio piangendo.",
 };
 
+let diagRun=0;
 function finish(winner){
   el('gameScreen').classList.add('hidden');
   const f=el('finalScreen'); f.style.display='block';
@@ -456,34 +457,33 @@ function finish(winner){
   journey+=` Lungo la strada hai eliminato ${picksDone} titoli senza un briciolo di rimorso. Freddezza da villain di terza stagione.`;
 
   const full = d.d + "\n\n" + journey + "\n\n" + (WINNER_LINE[winner.id]||"");
-  el('diagTitle').textContent=d.t;
+
+  // 結果は1回だけ確定表示する。まずローディングのみ表示（ルールベースを即出しして上書きしない）。
+  const runId = ++diagRun;
+  window.__winner=winner; window.__diag=d; window.__diagFull=full;
+  el('diagTitle').textContent='🧠 Sto leggendo nella tua anima da otaku...';
   el('diagText').style.whiteSpace='pre-line';
-  el('diagText').textContent=full;
+  el('diagText').textContent='Diagnosi in preparazione... un attimo (o un brivido).';
 
   Audio_.fanfare();
   window.scrollTo({top:0,behavior:'smooth'});
-  window.__winner=winner; window.__diag=d; window.__diagFull=full;
-
-  enhanceWithAI(winner); // AI診断で上書き（失敗時はルールベースのまま）
+  runDiagnosis(winner, runId, d, full);
 }
 
-// AI診断（Cloudflare Function /api/diagnose を呼ぶ）。ローカルファイル等で失敗したらそのまま。
-async function enhanceWithAI(winner){
-  const titleEl=el('diagTitle');
-  titleEl.insertAdjacentHTML('afterend','<div id="aiNote" style="color:#37e0ff;font-size:12px;margin:4px 0">🤖 Sto affinando la diagnosi con l\'AI...</div>');
+// 診断を1回だけ確定表示：AI優先、失敗時のみルールベース。古い実行は無視して上書き競合を防ぐ。
+async function runDiagnosis(winner, runId, d, full){
+  let title=d.t, text=full;
   try{
     const payload={ winner:{name:winner.name,genre:winner.genre},
       picks:picks.map(p=>({name:p.name,genre:p.genre})), picksDone:picksDone };
     const r=await fetch('/api/diagnose',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
-    if(!r.ok) throw new Error('api '+r.status);
-    const dd=await r.json();
-    if(dd && dd.text){
-      titleEl.textContent=dd.title||titleEl.textContent;
-      el('diagText').textContent=dd.text;
-      window.__diagFull=dd.text;
-    }
-  }catch(e){ /* fallback: diagnosi rule-based già mostrata */ }
-  finally{ const n=document.getElementById('aiNote'); if(n) n.remove(); }
+    if(r.ok){ const dd=await r.json(); if(dd && dd.text){ title=dd.title||d.t; text=dd.text; } }
+  }catch(e){ /* fallback: rule-based */ }
+  if(runId!==diagRun) return; // 新しいゲームが始まっていたら古い結果は捨てる
+  el('diagTitle').textContent=title;
+  el('diagText').style.whiteSpace='pre-line';
+  el('diagText').textContent=text;
+  window.__diagFull=text;
 }
 
 el('startBtn').addEventListener('click',startGame);

@@ -20,23 +20,26 @@ export async function onRequestPost(context) {
     const path = Array.isArray(data.picks) ? data.picks : [];
     const pathNames = path.map(p => `${p.name}(${p.genre})`).join(' → ');
 
-    const prompt = `Sei un diagnosta di personalità dissacrante e spiritoso per un pubblico italiano di appassionati di anime.
-Analizza il PERCORSO di scelte di un utente in un torneo "trova il tuo anime del cuore" e scrivi una diagnosi della personalità in ITALIANO, con tono sfacciato, ironico, black humor e un pizzico di slang. Battute da "otaku", frecciatine affettuose, sarcasmo. MAI offensivo su etnia/religione/genere/orientamento: colpisci solo i gusti anime e i cliché da fan.
+    const prompt = `Sei un diagnosta di personalità dissacrante, spiritoso e SEMPRE ORIGINALE per un pubblico italiano di appassionati di anime.
+Scrivi una diagnosi della personalità UNICA e cucita su misura, in ITALIANO, con tono sfacciato, ironico, black humor e un pizzico di slang. Frecciatine affettuose sui cliché da fan. MAI offensivo su etnia, religione, genere o orientamento: colpisci solo i gusti anime.
 
-Vincitore finale: ${winner.name} (genere: ${winner.genre})
-Percorso completo delle scelte (in ordine): ${pathNames || 'non disponibile'}
-Numero di scelte fatte: ${data.picksDone || path.length}
+DATI DELL'UTENTE:
+- Vincitore finale: ${winner.name} (genere: ${winner.genre})
+- Titoli scelti lungo il percorso, in ordine: ${pathNames || 'non disponibile'}
+- Numero di scelte fatte: ${data.picksDone || path.length}
 
-Regole:
-- Basati sul PERCORSO e sulle TENDENZE (quali generi ha scelto di più, coerenza o incoerenza, colpi di scena), non solo sul vincitore.
-- Inventa un'etichetta di personalità divertente e tagliente (es. "Otaku shōnen in negazione", "Edgelord con abbonamento alla terapia", "Boomer degli anime travestito da Gen Z").
-- 3-5 frasi, italiano naturale e brillante. Niente markdown, niente asterischi.
+ISTRUZIONI FONDAMENTALI (per garantire varietà):
+- Inventa OGNI VOLTA un'etichetta di personalità completamente NUOVA e originale, cucita su QUESTO percorso specifico. NON riutilizzare etichette generiche o ricorrenti: sorprendimi.
+- Cita ESPLICITAMENTE 2 o 3 titoli SPECIFICI presi dal percorso qui sopra e usali per le battute (non solo il vincitore).
+- Analizza le TENDENZE reali: quale genere domina, se è coerente o caotico, eventuali colpi di scena tra i titoli scelti.
+- Sii imprevedibile: due utenti con percorsi diversi devono ricevere diagnosi MOLTO diverse tra loro.
+- 3-5 frasi, italiano naturale e brillante. Niente markdown, niente asterischi, niente elenchi.
 
-Rispondi SOLO con JSON valido: {"title":"etichetta della personalità con 1 emoji","text":"la diagnosi"}`;
+Rispondi SOLO con JSON valido: {"title":"etichetta personalità originale con 1 emoji","text":"la diagnosi"}`;
 
     const body = JSON.stringify({
       contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: { temperature: 1.0, responseMimeType: 'application/json' },
+      generationConfig: { temperature: 1.35, topP: 0.95, responseMimeType: 'application/json' },
     });
 
     let out = null, lastErr = '';
